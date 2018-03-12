@@ -131,11 +131,17 @@ if __name__ == '__main__':
             task_input = search_task_menu().lower()
             while True:
                 if task_input in ['d', 't', 'k', 'p', 'r']:
+                    tasks = ts.filter_input(task_input)
+                    if tasks.empty:
+                        task_input = search_task_menu(
+                            "No results were found using your criteria\n"
+                            "Please try again.")
+                        continue
                     break
                 else:
                     task_input = search_task_menu(
                         "Selection not recognized. Try again.")
-            tasks = ts.filter_input(task_input)
+                    continue
             ts.task_pages(tasks)
             continue
 

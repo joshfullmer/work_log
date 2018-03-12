@@ -16,7 +16,7 @@ def filter_input(selection):
     if selection == 'd':
         return date_search(tasks)
     if selection == 't':
-        raise NotImplementedError
+        return duration_search(tasks)
     if selection == 'k':
         raise NotImplementedError
     if selection == 'p':
@@ -46,6 +46,20 @@ def date_search(tasks):
                 continue
             break
     return tasks[tasks['date'] == dates[index-1]]
+
+
+def duration_search(tasks):
+    work_log.clear()
+    print("What duration (in minutes) would you like to search by?")
+    while True:
+        duration = input("> ")
+        try:
+            duration = int(duration)
+        except ValueError:
+            print("Whole numbers only. Try again.")
+            continue
+        break
+    return tasks.loc[tasks['duration'] == duration]
 
 
 def task_pages(tasks):
