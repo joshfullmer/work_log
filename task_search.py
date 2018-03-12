@@ -3,6 +3,7 @@ Provides functions to search for tasks in a CSV of tasks
 
 Is passed a list of dicts???
 """
+import datetime
 import pandas as pd
 
 import work_log
@@ -12,17 +13,16 @@ def filter_input(selection):
     tasks = pd.read_csv('work_log.csv')
     tasks['date'] = pd.to_datetime(tasks['date'])
     tasks = tasks.fillna('')
-    # print(tasks)
     if selection == 'd':
         return date_search(tasks)
     if selection == 't':
         return duration_search(tasks)
     if selection == 'k':
-        raise NotImplementedError
+        return keyword_search(tasks)
     if selection == 'p':
-        raise NotImplementedError
+        return regex_search(tasks)
     if selection == 'r':
-        raise NotImplementedError
+        return date_range_search(tasks)
 
 
 def date_search(tasks):
@@ -60,6 +60,56 @@ def duration_search(tasks):
             continue
         break
     return tasks.loc[tasks['duration'] == duration]
+
+
+def keyword_search(tasks):
+    work_log.clear()
+    keyword = input("What keyword would you like to search by?\n> ")
+    indices = set()
+    for column in tasks:
+        tasks[column] = tasks[column].astype(str)
+        results = tasks.loc[tasks[column].str.contains(keyword)]
+        indices |= set(results.index.values)
+    return tasks.iloc[list(indices)]
+
+
+def regex_search(tasks):
+    work_log.clear()
+    regex = input("What regex pattern would you like to search by?\n> ")
+    indices = set()
+    for column in tasks:
+        tasks[column] = tasks[column].astype(str)
+        results = tasks.loc[tasks[column].str.match(regex)]
+        indices |= set(results.index.values)
+    return tasks.iloc[list(indices)]
+
+
+def date_range_search(tasks):
+    work_log.clear()
+    from_date = input("What is the date range you would like to search by?\n"
+                      "(DD/MM/YYYY date format)\n"
+                      "FROM: ")
+    while True:
+        try:
+            from_date = datetime.datetime.strptime(from_date, "%d/%m/%Y")
+        except ValueError:
+            work_log.clear()
+            print("Couldn't convert input into date. Try again.")
+            from_date = input("From when? (DD/MM/YYYY)\n> ")
+            continue
+        break
+    to_date = input("TO: ")
+    while True:
+        try:
+            to_date = datetime.datetime.strptime(to_date, "%d/%m/%Y")
+        except ValueError:
+            print("Couldn't convert input into date. Try again.")
+            from_date = input("To when? (DD/MM/YYYY)\n> ")
+            continue
+        break
+    if to_date < from_date:
+        to_date, from_date = from_date, to_date
+    return tasks.loc[tasks['date'].isin(pd.date_range(from_date, to_date))]
 
 
 def task_pages(tasks):
