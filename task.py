@@ -1,11 +1,14 @@
 """
-Class for tasks that will be added to the work log
+Task class for the work log.
 
-Need to implement:
-- Date
-- Title
-- Time spent
-- Notes
+Initialized with:
+- date
+- title
+- duration
+- notes (optional)
+
+Has one method:
+- add_to_csv
 """
 import csv
 
@@ -20,7 +23,13 @@ class Task():
         self.notes = notes
 
     def add_to_csv(self):
+        """
+        Add the Task instance to CSV
+        """
+        # Create CSV if it doesn't exist, add headers if they don't exist
         initialize_csv()
+
+        # Write to CSV
         with open(FILENAME, 'a', newline='') as csvfile:
             fieldnames = ['date', 'title', 'duration', 'notes']
             writer = csv.DictWriter(csvfile, fieldnames)
