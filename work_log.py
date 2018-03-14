@@ -24,6 +24,74 @@ def clear():
     os.system('cls' if os.name == 'nt' else 'clear')
 
 
+def menu_loop():
+    while True:
+        # Main menu input loop
+        menu_input = main_menu(message).lower()
+        while True:
+            if menu_input in menu:
+                break
+            else:
+                menu_input = main_menu("Selection not recognized. Try again.")
+
+        # Runs selected function
+        menu[menu_input]()
+
+        # Quit program if selection is q
+        if menu_input == 'q':
+            break
+
+
+def add_task():
+    # Unpacks the dictionary into kwargs to create the task
+    task = Task(**create_task_menu())
+
+    # Add task to CSV
+    task.add_to_csv()
+
+    # Display results and
+    # return to main menu
+    clear()
+    print("Task entry has been added!\n")
+    print("Date: {}\nTitle: {}\nDuration: {}\nNotes: {}\n".format(
+        datetime.datetime.strftime(task.date, "%d/%m/%Y"),
+        task.title,
+        task.duration,
+        task.notes,
+    ))
+    input("Press Enter to return to the main menu.")
+
+
+def search_task():
+    # Task input loop
+    task_input = search_task_menu().lower()
+    while True:
+        if task_input in ['d', 't', 'k', 'p', 'r']:
+
+            # Run search based on user input
+            tasks = ts.filter_input(task_input)
+
+            # Restart input loop if no search results are found
+            if tasks.empty:
+                task_input = search_task_menu(
+                    "No results were found using your criteria\n"
+                    "Please try again.")
+                continue
+            break
+        else:
+            task_input = search_task_menu(
+                "Selection not recognized. Try again.")
+            continue
+
+    # Display results from search
+    ts.task_pages(tasks)
+
+
+def quit_program():
+    clear()
+    print("Thanks for using the work log!\n")
+
+
 def main_menu(message=None):
     """
     Runs the main menu.
@@ -159,71 +227,16 @@ def search_task_menu(message=None):
     return input("> ")
 
 
+menu = {
+    'a': add_task,
+    's': search_task,
+    'q': quit_program,
+}
+
+
 if __name__ == '__main__':
     # Instantiate error message
     message = None
 
     # Main Menu loop
-    while True:
-
-        # Main menu input loop
-        menu_input = main_menu(message).lower()
-        while True:
-            if menu_input in ['a', 's', 'q']:
-                break
-            else:
-                menu_input = main_menu("Selection not recognized. Try again.")
-
-        # ADD TASK
-        if menu_input == 'a':
-
-            # Unpacks the dictionary into kwargs to create the task
-            task = Task(**create_task_menu())
-
-            # Add task to CSV
-            task.add_to_csv()
-
-            # Display results and
-            # return to main menu
-            clear()
-            print("Task entry has been added!\n")
-            print("Date: {}\nTitle: {}\nDuration: {}\nNotes: {}\n".format(
-                datetime.datetime.strftime(task.date, "%d/%m/%Y"),
-                task.title,
-                task.duration,
-                task.notes,
-            ))
-            input("Press Enter to return to the main menu.")
-
-        # SEARCH TASKS
-        if menu_input == 's':
-
-            # Task input loop
-            task_input = search_task_menu().lower()
-            while True:
-                if task_input in ['d', 't', 'k', 'p', 'r']:
-
-                    # Run search based on user input
-                    tasks = ts.filter_input(task_input)
-
-                    # Restart input loop if no search results are found
-                    if tasks.empty:
-                        task_input = search_task_menu(
-                            "No results were found using your criteria\n"
-                            "Please try again.")
-                        continue
-                    break
-                else:
-                    task_input = search_task_menu(
-                        "Selection not recognized. Try again.")
-                    continue
-
-            # Display results from search
-            ts.task_pages(tasks)
-            continue
-
-        # QUIT PROGRAM
-        if menu_input == 'q':
-            clear()
-            print("Thanks for using the work log!\n")
-            break
+    menu_loop()
