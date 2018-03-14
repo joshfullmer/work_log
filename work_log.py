@@ -10,8 +10,6 @@ as the logic to run the menu.
 import datetime
 import os
 
-import pandas as pd
-
 from task import Task
 import task_search as ts
 
