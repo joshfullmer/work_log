@@ -64,6 +64,10 @@ def add_task():
 
 def search_task():
     # Task input loop
+    if not os.path.isfile("work_log.csv"):
+        clear()
+        return input("No tasks have been created."
+                     "Press enter to return to main menu.\n> ")
     task_input = search_task_menu().lower()
     while True:
         if task_input in ['d', 't', 'k', 'p', 'r']:
@@ -108,7 +112,8 @@ def main_menu(message=None):
     else:
         print("What would you like to do?\n")
     print("(A)dd a task")
-    print("(S)earch for a task")
+    if os.path.isfile("work_log.csv"):
+        print("(S)earch for a task")
     print("(Q)uit")
     return input("> ")
 
