@@ -282,7 +282,7 @@ def edit_task(index):
             key = 'duration'
             value = work_log.get_task_duration()
         if field == 'n':
-            key = 'note'
+            key = 'notes'
             value = work_log.get_task_notes()
         break
 

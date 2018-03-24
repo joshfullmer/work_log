@@ -10,6 +10,8 @@ as the logic to run the menu.
 import datetime
 import os
 
+import pandas as pd
+
 from task import Task
 import task_search as ts
 
@@ -140,8 +142,8 @@ def get_task_date():
     Returns a datetime object.
     """
     clear()
-    date_string = input("When was this task completed? (DD/MM/YYYY)\n> ")
     while True:
+        date_string = input("When was this task completed? (DD/MM/YYYY)\n> ")
         try:
             date = datetime.datetime.strptime(date_string, "%d/%m/%Y")
         except ValueError:
@@ -151,6 +153,13 @@ def get_task_date():
                 "When was this task completed? (DD/MM/YYYY)\n> ")
             continue
         else:
+            if date < pd.Timestamp.min or date > pd.Timestamp.max:
+                clear()
+                print("Date must be within the bounds: {} and {}".format(
+                    pd.Timestamp.min.strftime("%d/%m/%Y"),
+                    pd.Timestamp.max.strftime("%d/%m/%Y"),
+                ))
+                continue
             return date
 
 
